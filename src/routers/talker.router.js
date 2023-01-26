@@ -5,8 +5,8 @@ const { OK_STATUS } = require('../utils/httpStatuses');
 const router = express.Router();
 
 router.get('/talker', async (_req, res) => {
-  const talkers = await readFile;
-  res.status(OK_STATUS).json(talkers);
+  const talkers = await readFile();
+  return res.status(OK_STATUS).json(talkers);
 });
 
 module.exports = router;
