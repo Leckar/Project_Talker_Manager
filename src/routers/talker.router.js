@@ -3,7 +3,8 @@ const { nameValidator, ageValidator, talkValidator,
   watchedValidator, rateValidator } = require('../middlewares/talkerValidation');
 const tokenValidator = require('../middlewares/tokenValidation');
 const { readFile, writeFile } = require('../utils/fs');
-const { OK_STATUS, NOT_FOUND_STATUS, CREATED_STATUS } = require('../utils/httpStatuses');
+const { OK_STATUS, NOT_FOUND_STATUS,
+  NO_CONTENT_STATUS, CREATED_STATUS } = require('../utils/httpStatuses');
 
 const router = express.Router();
 
@@ -60,6 +61,14 @@ oldTalkers.splice(talkerIndex, 1, newTalker);
 const newTalkers = [...oldTalkers];
 await writeFile(newTalkers);
 res.status(OK_STATUS).json(newTalker);
+});
+
+router.delete('/talker/:id', tokenValidator, async (req, res) => {
+  const { id } = req.params;
+  const oldTalkers = await readFile();
+  const newTalkers = oldTalkers.filter((t) => t.id !== Number(id));
+  await writeFile(newTalkers);
+  res.status(NO_CONTENT_STATUS).end();
 });
 
 module.exports = router;
