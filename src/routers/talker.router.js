@@ -13,19 +13,27 @@ router.get('/talker', async (_req, res) => {
   return res.status(OK_STATUS).json(talkers);
 });
 
+router.get('/talker/search', tokenValidator, async (req, res) => {
+  const { q } = req.query;
+  const talkers = await readFile();
+  if (!q || q === '') return res.status(OK_STATUS).json(talkers);
+  const result = talkers.filter(({ name }) => name.includes(q));
+  return res.status(OK_STATUS).json(result);
+});
+
 router.get('/talker/:id', async (req, res) => {
   const { id } = req.params;
   const talkers = await readFile();
   const targetTalker = talkers.find((t) => t.id === Number(id));
   if (!targetTalker) {
     return res.status(NOT_FOUND_STATUS)
-      .json({ message: 'Pessoa palestrante não encontrada' });
+    .json({ message: 'Pessoa palestrante não encontrada' });
   }
   return res.status(OK_STATUS).json(targetTalker);
 });
 
 router.post('/talker', tokenValidator, nameValidator, ageValidator,
-  talkValidator, watchedValidator, rateValidator, async (req, res) => {
+talkValidator, watchedValidator, rateValidator, async (req, res) => {
   const { name, age, talk: { watchedAt, rate } } = req.body;
   const oldTalkers = await readFile();
   const newTalker = {
