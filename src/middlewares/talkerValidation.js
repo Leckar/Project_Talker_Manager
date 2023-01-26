@@ -56,7 +56,7 @@ const ratingCheck = (rating) => {
 };
 const rateValidator = (req, res, next) => {
   const { rate } = req.body.talk;
-  if (!rate || rate === '') {
+  if (!rate && rate !== 0 || rate === '') {
     return res.status(BAD_REQUEST_STATUS)
       .json({ message: 'O campo "rate" é obrigatório' });
     }

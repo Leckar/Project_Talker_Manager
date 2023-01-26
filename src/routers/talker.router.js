@@ -41,4 +41,25 @@ router.post('/talker', tokenValidator, nameValidator, ageValidator,
   res.status(CREATED_STATUS).json(newTalker);
 });
 
+router.put('/talker/:id', tokenValidator, nameValidator, ageValidator,
+talkValidator, watchedValidator, rateValidator, async (req, res) => {
+const { name, age, talk: { watchedAt, rate } } = req.body;
+const { id } = req.params;
+const oldTalkers = await readFile();
+const talkerIndex = oldTalkers.findIndex((t) => t.id === Number(id));
+const newTalker = {
+  name,
+  age,
+  id: Number(id),
+  talk: {
+    watchedAt,
+    rate,
+  },
+};
+oldTalkers.splice(talkerIndex, 1, newTalker);
+const newTalkers = [...oldTalkers];
+await writeFile(newTalkers);
+res.status(OK_STATUS).json(newTalker);
+});
+
 module.exports = router;
