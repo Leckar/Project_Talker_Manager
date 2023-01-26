@@ -1,6 +1,6 @@
 const { BAD_REQUEST_STATUS } = require('../utils/httpStatuses');
-const EMAIL_REGEX = require('../utils/regex');
 
+const EMAIL_REGEX = /^\S+@\S+\.\S+$/;
 const emailValidation = (req, res, next) => {
   const { email } = req.body;
   if (!email || email === '') {

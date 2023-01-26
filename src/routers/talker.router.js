@@ -1,6 +1,9 @@
 const express = require('express');
-const { readFile } = require('../utils/fs');
-const { OK_STATUS, NOT_FOUND_STATUS } = require('../utils/httpStatuses');
+const { nameValidator, ageValidator, talkValidator,
+  watchedValidator, rateValidator } = require('../middlewares/talkerValidation');
+const tokenValidator = require('../middlewares/tokenValidation');
+const { readFile, writeFile } = require('../utils/fs');
+const { OK_STATUS, NOT_FOUND_STATUS, CREATED_STATUS } = require('../utils/httpStatuses');
 
 const router = express.Router();
 
@@ -18,6 +21,24 @@ router.get('/talker/:id', async (req, res) => {
       .json({ message: 'Pessoa palestrante não encontrada' });
   }
   return res.status(OK_STATUS).json(targetTalker);
+});
+
+router.post('/talker', tokenValidator, nameValidator, ageValidator,
+  talkValidator, watchedValidator, rateValidator, async (req, res) => {
+  const { name, age, talk: { watchedAt, rate } } = req.body;
+  const oldTalkers = await readFile();
+  const newTalker = {
+    name,
+    age,
+    id: oldTalkers.length + 1,
+    talk: {
+      watchedAt,
+      rate,
+    },
+  };
+  const newTalkers = [...oldTalkers, newTalker];
+  await writeFile(newTalkers);
+  res.status(CREATED_STATUS).json(newTalker);
 });
 
 module.exports = router;
